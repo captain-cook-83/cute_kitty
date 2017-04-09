@@ -7,11 +7,12 @@ using Kittypath;
 
 [RequireComponent(typeof(Animator))]
 [RequireComponent(typeof(Seeker))]
+[RequireComponent(typeof(JumpStateController))]
 public class CharacterMovementController : MonoBehaviour {
 
-	public Transform moveTarget;
+	private int PROPERTY_BODYLEVEL;
 
-	public Transform jumpTarget;
+	public Transform moveTarget;
 
 	public RichFunnel.FunnelSimplification funnelSimplification = RichFunnel.FunnelSimplification.None;
 
@@ -21,47 +22,44 @@ public class CharacterMovementController : MonoBehaviour {
 
 	private Seeker seeker;
 
+	private JumpStateController jumpStateController;
+
 	private KittyPath kittyPath;
 
 	private PathSegment currentPathSegment;
 
-	private int propertyBodyLevel;
-	private int propertyJumpUp;
-	private int propertyJumpForward;
-	private int propertyJumpDown;
-
 	private Vector3 _lookAtTarget = new Vector3 ();
+
+	public void MoveToTarget(Vector3 targetPosition) {
+		seeker.StartPath (transform.position, targetPosition, OnPathComplete);
+	}
+
+	void Awake () {
+		PROPERTY_BODYLEVEL = Animator.StringToHash ("BodyLevel");
+	}
 
 	void Start () {
 		animator = GetComponent<Animator> ();
 		seeker = GetComponent<Seeker> ();
+		jumpStateController = GetComponent<JumpStateController> ();
 
-		propertyBodyLevel = Animator.StringToHash ("BodyLevel");
-		propertyJumpUp = Animator.StringToHash ("AnyState->JumpUp");
-		propertyJumpForward = Animator.StringToHash ("AnyState->JumpForward");
-		propertyJumpDown = Animator.StringToHash ("AnyState->JumpDown");
-
-		if (moveTarget != null) {
+		if (moveTarget != null && moveTarget.gameObject.activeSelf) {			// 方便场景测试
 			MoveToTarget (moveTarget.position);
 		}
 	}
 
 	void Update () {
-		if (currentPathSegment == null)
+		if (currentPathSegment == null || jumpStateController.IsProcessing)
 			return;
 
 		if (VectorMath.SqrDistanceXZ (currentPathSegment.endPoint, transform.position) < stopDistance * stopDistance) {
 			if (kittyPath.HasNext ()) {
 				UpdateSegmentTargetAndDirection ();
 			} else {
-				animator.SetInteger (propertyBodyLevel, AnimationBodyLevel.Stand);
+				animator.SetInteger (PROPERTY_BODYLEVEL, AnimationBodyLevel.Stand);
 				currentPathSegment = null;
 			}
 		}
-	}
-
-	public void MoveToTarget(Vector3 targetPosition) {
-		seeker.StartPath (transform.position, targetPosition, OnPathComplete);
 	}
 
 	private void OnPathComplete(Path path) {
@@ -85,22 +83,9 @@ public class CharacterMovementController : MonoBehaviour {
 
 		//设置角色动画参数
 		if (PathSegmentThroughStyle.Directly == currentPathSegment.throughStyle) {
-			animator.SetInteger (propertyBodyLevel, AnimationBodyLevel.Trot);
+			animator.SetInteger (PROPERTY_BODYLEVEL, AnimationBodyLevel.Trot);
 		} else {
-			jumpTarget.position = currentPathSegment.endPoint;
-			jumpTarget.gameObject.SetActive (true);
-
-			switch (currentPathSegment.throughStyle) {
-			case PathSegmentThroughStyle.JumpUp:
-				animator.SetTrigger (propertyJumpUp);
-				break;
-			case PathSegmentThroughStyle.JumpForward:
-				animator.SetTrigger (propertyJumpForward);
-				break;
-			case PathSegmentThroughStyle.JumpDown:
-				animator.SetTrigger (propertyJumpDown);
-				break;
-			}
+			jumpStateController.JumpToTarget (currentPathSegment.endPoint, currentPathSegment.throughStyle);
 		}
 	}
 
