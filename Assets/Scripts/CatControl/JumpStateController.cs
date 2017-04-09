@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(Animator))]
 public class JumpStateController : MonoBehaviour {
 
 	public Transform jumpTarget;
@@ -51,11 +53,15 @@ public class JumpStateController : MonoBehaviour {
 		}
 	}
 
+	/**
+	 * 跳跃角色离开地面
+	 */
 	void OnJumpStartEvent() {
 		rigidbody.isKinematic = true;
 
 		if (jumpTarget.gameObject.activeSelf) {
 			targetPosition = jumpTarget.position;
+			jumpTarget.gameObject.SetActive (false);
 		} else {
 			targetPosition = transform.position + transform.forward * normalizedForwardDistance;
 		}
@@ -71,10 +77,16 @@ public class JumpStateController : MonoBehaviour {
 		}
 	}
 
+	/**
+	 * 跳跃角色略过至高点，即将下降
+	 */
 	void OnJumpEndEvent() {
 		rigidbody.isKinematic = false;
 	}
 
+	/**
+	 * 跳跃角色动作即将结束，平面位移停止
+	 */ 
 	void OnJumpStopEvent() {
 		targetPosition = Vector3.zero;
 	}

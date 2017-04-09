@@ -8,8 +8,6 @@ public class OnMovementState : StateMachineBehaviour {
 
 	override public void OnStateMove(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
 		Transform transform = animator.transform;
-		Vector3 newPosition = transform.position;
-		newPosition.z += animator.GetFloat(rootMotionParameterName) * Time.deltaTime;
-		transform.position = newPosition;
+		transform.position += transform.forward * animator.GetFloat (rootMotionParameterName) * Time.deltaTime;
 	}
 }
