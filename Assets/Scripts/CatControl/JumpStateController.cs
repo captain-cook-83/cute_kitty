@@ -39,7 +39,7 @@ public class JumpStateController : MonoBehaviour {
 				position = Vector3.Lerp (position, targetPosition, Time.deltaTime * timedUpwardSpeed);
 				moveEnd = position.y > targetPosition.y;
 			} else {
-				position.z += animator.GetFloat(rootMotionParameterName) * Time.deltaTime * multipleForwardSpeed;
+				position += transform.forward * animator.GetFloat(rootMotionParameterName) * Time.deltaTime * multipleForwardSpeed;
 				if (targetDirection.y <= - minVerticalJumpHeight) {
 					moveEnd = position.y <= targetPosition.y;
 				}
