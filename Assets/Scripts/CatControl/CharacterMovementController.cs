@@ -16,7 +16,9 @@ public class CharacterMovementController : MonoBehaviour {
 
 	public RichFunnel.FunnelSimplification funnelSimplification = RichFunnel.FunnelSimplification.None;
 
-	public float stopDistance = 0.02F;
+	public float stopDistance = 0.03F;
+
+	public float minJumpVerticleHeight = 0.05F;
 
 	private Animator animator;
 
@@ -48,11 +50,25 @@ public class CharacterMovementController : MonoBehaviour {
 		}
 	}
 
-	void Update () {
+	void Update() {
+		if (Input.GetMouseButton(0)) {
+			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+			RaycastHit hit;
+
+			if (Physics.Raycast (ray, out hit, 100)) {
+				if (hit.collider.CompareTag ("Environments")) {
+					MoveToTarget(hit.point);
+				}
+			}
+		}
+	}
+
+	void LateUpdate () {
 		if (currentPathSegment == null || jumpStateController.IsProcessing)
 			return;
 
-		if (VectorMath.SqrDistanceXZ (currentPathSegment.endPoint, transform.position) < stopDistance * stopDistance) {
+		if (jumpStateController.CheckFinishedSign() || 
+				VectorMath.SqrDistanceXZ (currentPathSegment.endPoint, transform.position) < stopDistance * stopDistance) {
 			if (kittyPath.HasNext ()) {
 				UpdateSegmentTargetAndDirection ();
 			} else {
@@ -65,7 +81,7 @@ public class CharacterMovementController : MonoBehaviour {
 	private void OnPathComplete(Path path) {
 		path.Claim (this);
 		if (!path.error) {
-			kittyPath = new KittyPath (path.vectorPath);
+			kittyPath = new KittyPath (path.vectorPath, minJumpVerticleHeight, jumpStateController.MaxForwardDistance);
 			if (kittyPath.HasNext ()) {
 				UpdateSegmentTargetAndDirection ();
 			}
@@ -79,6 +95,7 @@ public class CharacterMovementController : MonoBehaviour {
 		// 调整角色方向
 		_lookAtTarget.x = currentPathSegment.endPoint.x;
 		_lookAtTarget.z = currentPathSegment.endPoint.z;
+		_lookAtTarget.y = transform.position.y;
 		transform.LookAt(_lookAtTarget);
 
 		//设置角色动画参数

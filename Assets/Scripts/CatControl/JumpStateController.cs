@@ -9,6 +9,8 @@ using Kittyutils;
 [RequireComponent(typeof(Animator))]
 public class JumpStateController : MonoBehaviour {
 
+	private const float MAX_SPEED_MULTIPLE = 2.0F;
+
 	private int PROPERTY_JUMPUP;
 	private int PROPERTY_JUMPFORWARD;
 	private int PROPERTY_JUMPDOWN;
@@ -16,8 +18,7 @@ public class JumpStateController : MonoBehaviour {
 	public string rootMotionParameterName = "MovementSpeed";
 
 	public float timedUpwardSpeed = 10.0F;
-	public float stopOffset = 0.1F;
-	public float normalizedForwardDistance = 0.24F;
+	public float normalizedForwardDistance = 0.4F;
 
 	private Rigidbody rigidbody;
 	private Animator animator;
@@ -28,33 +29,66 @@ public class JumpStateController : MonoBehaviour {
 	private float multipleForwardSpeed = 1.0F;
 	private bool isMoving = false;
 	private bool isProcessing = false;
+	private bool finishedSign = false;
 
+	/**
+	 * 单词前向跳跃的最大距离
+	 */ 
+	public float MaxForwardDistance {
+		get { return normalizedForwardDistance * MAX_SPEED_MULTIPLE; }
+	}
+
+	/**
+	 * 检查跳跃动作是否正在处理之中
+	 */
 	public bool IsProcessing {
 		get { return isProcessing; }
 	}
 
+	/**
+	 * 检查并重置跳跃完成标记
+	 */ 
+	public bool CheckFinishedSign() {
+		if (finishedSign) {
+			finishedSign = false;
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * 控制角色从当前位置向指定位置跳跃
+	 * 
+	 * \param targetPosition 目标位置（全局坐标系）
+	 * \param throughStyle 通过方式，默认指定为向前跳跃
+	 */ 
 	public void JumpToTarget(Vector3 targetPosition, PathSegmentThroughStyle throughStyle) {
 		if (PathSegmentThroughStyle.JumpUp == throughStyle) {
-			this.targetPosition = targetPosition + new Vector3 (0, 0.1F, 0);
+			this.targetPosition = targetPosition + new Vector3 (0, 0.02F, 0);
 			multipleForwardSpeed = 1.0F;
 		} else {
 			this.targetPosition = targetPosition;
-			multipleForwardSpeed = Mathf.Max (1.0F, VectorMath.DistanceXZ (targetPosition, transform.position) / normalizedForwardDistance);
+			multipleForwardSpeed = VectorMath.DistanceXZ (targetPosition, transform.position) / normalizedForwardDistance;
+			multipleForwardSpeed = Mathf.Clamp (multipleForwardSpeed, 1.0F, MAX_SPEED_MULTIPLE);
 		}
 
 		switch (throughStyle) {
 		case PathSegmentThroughStyle.JumpUp:
 			animator.SetTrigger (PROPERTY_JUMPUP);
 			break;
-		case PathSegmentThroughStyle.JumpForward:
-			animator.SetTrigger (PROPERTY_JUMPFORWARD);
-			break;
 		case PathSegmentThroughStyle.JumpDown:
 			animator.SetTrigger (PROPERTY_JUMPDOWN);
 			break;
+		default:
+			animator.SetTrigger (PROPERTY_JUMPFORWARD);
+			break;
 		}
+
 		this.throughStyle = throughStyle;
+
 		isProcessing = true;
+		finishedSign = false;
 	}
 
 	void Awake () {
@@ -84,7 +118,8 @@ public class JumpStateController : MonoBehaviour {
 			}
 
 			transform.position = position;
-			if (moveEnd || Vector3.Distance (position, targetPosition) < stopOffset) {		// 可以考虑去除的判断
+
+			if (moveEnd) {
 				OnJumpEndEvent ();
 				OnJumpStopEvent ();
 			}
@@ -118,5 +153,6 @@ public class JumpStateController : MonoBehaviour {
 	 */
 	void OnJumpAnimationEnd() {
 		isProcessing = false;
+		finishedSign = true;
 	}
 }
