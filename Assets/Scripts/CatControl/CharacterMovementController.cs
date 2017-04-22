@@ -50,13 +50,22 @@ public class CharacterMovementController : MonoBehaviour {
 		}
 	}
 
+	private Vector3 hitPointOnButtonDown = Vector3.zero;
+
 	void Update() {
-		if (Input.GetMouseButton(0)) {
+		RaycastHit hit;
+
+		if (Input.GetMouseButtonDown (0)) {
 			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-			RaycastHit hit;
 
 			if (Physics.Raycast (ray, out hit, 100)) {
-				if (hit.collider.CompareTag ("Environments")) {
+				hitPointOnButtonDown = hit.point;
+			}
+		} else if (Input.GetMouseButtonUp(0)) {
+			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+			if (Physics.Raycast (ray, out hit, 100)) {
+				if (hit.collider.CompareTag ("Environments") && Vector3.Distance (hit.point, hitPointOnButtonDown) < 0.1) {
 					MoveToTarget(hit.point);
 				}
 			}
