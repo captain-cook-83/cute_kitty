@@ -65,7 +65,7 @@ public class CharacterMovementController : MonoBehaviour {
 			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
 			if (Physics.Raycast (ray, out hit, 100)) {
-				if (hit.collider.CompareTag ("Environments") && Vector3.Distance (hit.point, hitPointOnButtonDown) < 0.1) {
+				if (hit.collider.CompareTag ("Environments") && Vector3.Distance (hit.point, hitPointOnButtonDown) < 0.05) {
 					MoveToTarget(hit.point);
 				}
 			}
