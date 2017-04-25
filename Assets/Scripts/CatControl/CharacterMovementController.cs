@@ -10,8 +10,6 @@ using Kittypath;
 [RequireComponent(typeof(JumpStateController))]
 public class CharacterMovementController : MonoBehaviour {
 
-	private int PROPERTY_BODYLEVEL;
-
 	public Transform moveTarget;
 
 	public RichFunnel.FunnelSimplification funnelSimplification = RichFunnel.FunnelSimplification.None;
@@ -34,10 +32,6 @@ public class CharacterMovementController : MonoBehaviour {
 
 	public void MoveToTarget(Vector3 targetPosition) {
 		seeker.StartPath (transform.position, targetPosition, OnPathComplete);
-	}
-
-	void Awake () {
-		PROPERTY_BODYLEVEL = Animator.StringToHash ("BodyLevel");
 	}
 
 	void Start () {
@@ -81,7 +75,7 @@ public class CharacterMovementController : MonoBehaviour {
 			if (kittyPath.HasNext ()) {
 				UpdateSegmentTargetAndDirection ();
 			} else {
-				animator.SetInteger (PROPERTY_BODYLEVEL, AnimationBodyLevel.Stand);
+				animator.SetInteger (AnimatorPropertyName.GetInstance().BodyLevel, AnimatorBodyLevel.Stand);
 				currentPathSegment = null;
 			}
 		}
@@ -109,20 +103,9 @@ public class CharacterMovementController : MonoBehaviour {
 
 		//设置角色动画参数
 		if (PathSegmentThroughStyle.Directly == currentPathSegment.throughStyle) {
-			animator.SetInteger (PROPERTY_BODYLEVEL, AnimationBodyLevel.Trot);
+			animator.SetInteger (AnimatorPropertyName.GetInstance().BodyLevel, AnimatorBodyLevel.Trot);
 		} else {
 			jumpStateController.JumpToTarget (currentPathSegment.endPoint, currentPathSegment.throughStyle);
 		}
-	}
-
-	class AnimationBodyLevel {
-		
-		public const int Stand = 0;
-
-		public const int Walk = 1;
-
-		public const int Trot = 2;
-
-		public const int Run = 3;
 	}
 }
