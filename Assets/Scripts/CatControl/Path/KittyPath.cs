@@ -41,8 +41,8 @@ namespace Kittypath {
 			if (PathSegmentThroughStyle.Directly == pathSegment.throughStyle) {
 				Vector3 pathDirection = pathSegment.endPoint - pathSegment.startPoint;
 				if (pathDirection.sqrMagnitude <= maxSqrJumpForwardDistance) {
-					Ray ray = new Ray (pathSegment.startPoint + pathDirection * 0.5F, Vector3.down);
-					if (! Physics.Raycast (ray, minJumpVerticleHeight)) {
+					Ray ray = new Ray (pathSegment.startPoint + pathDirection * 0.5F + Vector3.up * minJumpVerticleHeight, Vector3.down);
+					if (! Physics.Raycast (ray, minJumpVerticleHeight * 2)) {
 						pathSegment.throughStyle = PathSegmentThroughStyle.JumpForward;
 					}
 				}

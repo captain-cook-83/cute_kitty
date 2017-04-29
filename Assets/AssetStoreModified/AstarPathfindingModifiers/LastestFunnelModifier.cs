@@ -62,6 +62,10 @@ namespace Pathfinding {
 			right.Add(vectorPath[vectorPath.Count-1]);
 
 			if (RunFunnel (left, right, funnelPath)) {
+				if (vectorPath.Count > 2) {
+					CheckNodeLink2 (vectorPath, funnelPath);
+				}
+
 				// Release lists back to the pool
 				ListPool<Vector3>.Release(p.vectorPath);
 				p.vectorPath = funnelPath;
@@ -73,6 +77,21 @@ namespace Pathfinding {
 
 			ListPool<Vector3>.Release(left);
 			ListPool<Vector3>.Release(right);
+		}
+
+		private static void CheckNodeLink2(List<Vector3> vectorPath, List<Vector3> funnelPath) {
+			PointGraph pointGraph = AstarPath.active.astarData.pointGraph;
+			if (pointGraph.GetNearest (vectorPath [1]).clampedPosition == vectorPath [1]) {
+				if (vectorPath [1] != funnelPath [1]) {
+					funnelPath.Insert (1, vectorPath [1]);
+					Debug.Log ("CheckNodeLink2: " + vectorPath [1]);
+				}
+
+				if (vectorPath [2] != funnelPath [2] && pointGraph.GetNearest (vectorPath [2]).clampedPosition == vectorPath [2]) {
+					funnelPath.Insert (2, vectorPath [2]);
+					Debug.Log ("CheckNodeLink2: " + vectorPath [2]);
+				}
+			}
 		}
 
 		/** Calculate a funnel path from the \a left and \a right portal lists.
