@@ -14,7 +14,7 @@ public class CharacterMovementController : MonoBehaviour {
 
 	public RichFunnel.FunnelSimplification funnelSimplification = RichFunnel.FunnelSimplification.None;
 
-	public float stopDistance = 0.03F;
+	public float stopDistance = 0.1F;
 
 	public float minJumpVerticleHeight = 0.05F;
 
@@ -75,6 +75,7 @@ public class CharacterMovementController : MonoBehaviour {
 			if (kittyPath.HasNext ()) {
 				UpdateSegmentTargetAndDirection ();
 			} else {
+				animator.SetTrigger (AnimatorPropertyName.GetInstance().Movement2StopTrigger);
 				animator.SetInteger (AnimatorPropertyName.GetInstance().BodyLevel, AnimatorBodyLevel.Stand);
 				currentPathSegment = null;
 			}

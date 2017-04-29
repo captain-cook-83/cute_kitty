@@ -15,11 +15,18 @@ public class AnimatorPropertyName {
 
 	private int bodyLevel;
 
+	private int movement2StopTrigger;
+
 	private AnimatorPropertyName() {
 		bodyLevel = Animator.StringToHash ("BodyLevel");
+		movement2StopTrigger = Animator.StringToHash ("Movement->Stop");
 	}
 
 	public int BodyLevel {
 		get { return bodyLevel; }
+	}
+
+	public int Movement2StopTrigger {
+		get { return movement2StopTrigger; }
 	}
 }
