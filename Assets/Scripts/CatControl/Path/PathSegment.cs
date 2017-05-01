@@ -16,5 +16,17 @@ namespace Kittypath {
 			this.startPoint = startPoint;
 			this.endPoint = endPoint;
 		}
+
+		public Vector3 Direction {
+			get { 
+				Vector3 result = endPoint - startPoint;
+				result.Normalize ();
+				return result;
+			}
+		}
+
+		public float Distance {
+			get { return (endPoint - startPoint).magnitude; }
+		}
 	}
 }

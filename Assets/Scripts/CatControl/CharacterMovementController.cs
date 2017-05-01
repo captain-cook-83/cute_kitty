@@ -10,7 +10,7 @@ using Kittypath;
 [RequireComponent(typeof(JumpStateController))]
 public class CharacterMovementController : MonoBehaviour {
 
-	public Transform moveTarget;
+	public bool isInteracived = false;
 
 	public RichFunnel.FunnelSimplification funnelSimplification = RichFunnel.FunnelSimplification.None;
 
@@ -24,43 +24,55 @@ public class CharacterMovementController : MonoBehaviour {
 
 	private JumpStateController jumpStateController;
 
+	private bool isMoving;
+
+	private Vector3 finalDirection = Vector3.zero;
+
 	private KittyPath kittyPath;
 
 	private PathSegment currentPathSegment;
 
 	private Vector3 _lookAtTarget = new Vector3 ();
 
-	public void MoveToTarget(Vector3 targetPosition) {
+	public void MoveToTarget(Vector3 targetPosition, Vector3 finalDirection) {
+		this.isMoving = true;
+		this.finalDirection = finalDirection;
 		seeker.StartPath (transform.position, targetPosition, OnPathComplete);
+	}
+
+	public void MoveToTarget(Vector3 targetPosition) {
+		MoveToTarget (targetPosition, Vector3.zero);
+	}
+
+	public bool IsMoving {
+		get { return isMoving; }
 	}
 
 	void Start () {
 		animator = GetComponent<Animator> ();
 		seeker = GetComponent<Seeker> ();
 		jumpStateController = GetComponent<JumpStateController> ();
-
-		if (moveTarget != null && moveTarget.gameObject.activeSelf) {			// 方便场景测试
-			MoveToTarget (moveTarget.position);
-		}
 	}
 
 	private Vector3 hitPointOnButtonDown = Vector3.zero;
 
 	void Update() {
-		RaycastHit hit;
+		if (isInteracived) {
+			RaycastHit hit;
 
-		if (Input.GetMouseButtonDown (0)) {
-			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+			if (Input.GetMouseButtonDown (0)) {
+				Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-			if (Physics.Raycast (ray, out hit, 100)) {
-				hitPointOnButtonDown = hit.point;
-			}
-		} else if (Input.GetMouseButtonUp(0)) {
-			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+				if (Physics.Raycast (ray, out hit, 100)) {
+					hitPointOnButtonDown = hit.point;
+				}
+			} else if (Input.GetMouseButtonUp(0)) {
+				Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-			if (Physics.Raycast (ray, out hit, 100)) {
-				if (hit.collider.CompareTag ("Environments") && Vector3.Distance (hit.point, hitPointOnButtonDown) < 0.05) {
-					MoveToTarget(hit.point);
+				if (Physics.Raycast (ray, out hit, 100)) {
+					if (hit.collider.CompareTag ("Environments") && Vector3.Distance (hit.point, hitPointOnButtonDown) < 0.05) {
+						MoveToTarget(hit.point);
+					}
 				}
 			}
 		}
@@ -75,9 +87,14 @@ public class CharacterMovementController : MonoBehaviour {
 			if (kittyPath.HasNext ()) {
 				UpdateSegmentTargetAndDirection ();
 			} else {
+				if (Vector3.zero != finalDirection) {
+					transform.LookAt (transform.position + finalDirection);
+				}
+
 				animator.SetTrigger (AnimatorPropertyName.GetInstance().Movement2StopTrigger);
 				animator.SetInteger (AnimatorPropertyName.GetInstance().BodyLevel, AnimatorBodyLevel.Stand);
 				currentPathSegment = null;
+				isMoving = false;
 			}
 		}
 	}
