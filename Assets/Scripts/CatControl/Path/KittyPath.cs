@@ -27,7 +27,7 @@ namespace Kittypath {
 					__vector3.y = jumpEndpoint.y;
 					Vector3 backDirection = __vector3 - jumpEndpoint;
 					backDirection.Normalize();
-					segment.endPoint = jumpEndpoint + backDirection * 0.12F;
+					segment.endPoint = jumpEndpoint + backDirection * 0.11F;
 					segment.throughStyle = PathSegmentThroughStyle.JumpUp;
 					pathSegments.Add (segment);
 
