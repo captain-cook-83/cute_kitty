@@ -14,12 +14,25 @@ namespace Kittypath {
 
 		private float maxSqrJumpForwardDistance;
 
+		private Vector3 __vector3 = new Vector3();
+
 		public KittyPath(List<Vector3> vectorPath, float minJumpVerticleHeight, float maxJumpForwardDistance) {
 			pathSegments = new List<PathSegment> (vectorPath.Count - 1);
 			for (int i = 1; i < vectorPath.Count; i++) {
 				PathSegment segment = new PathSegment (vectorPath[i - 1], vectorPath[i]);
 				if (segment.endPoint.y > segment.startPoint.y + minJumpVerticleHeight) {
+					Vector3 jumpEndpoint = segment.endPoint;
+					__vector3.x = segment.startPoint.x;
+					__vector3.z = segment.startPoint.z;
+					__vector3.y = jumpEndpoint.y;
+					Vector3 backDirection = __vector3 - jumpEndpoint;
+					backDirection.Normalize();
+					segment.endPoint = jumpEndpoint + backDirection * 0.12F;
 					segment.throughStyle = PathSegmentThroughStyle.JumpUp;
+					pathSegments.Add (segment);
+
+					segment = new PathSegment (segment.endPoint, jumpEndpoint);
+					segment.throughStyle = PathSegmentThroughStyle.Directly;
 				} else if (segment.endPoint.y < segment.startPoint.y - minJumpVerticleHeight) {
 					segment.throughStyle = PathSegmentThroughStyle.JumpDown;
 				} else {
