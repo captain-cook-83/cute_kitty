@@ -3,12 +3,12 @@ using BehaviorDesigner.Runtime;
 using BehaviorDesigner.Runtime.Tasks;
 
 [TaskCategory("CuteKitty/Search")]
-[TaskDescription("搜索场景内可以观看的照片")]
+[TaskDescription("搜索场景内可以主动寻找的点")]
 public class SearchAISign : Conditional {
 
 	public string aiSignsTagName;
 
-	public string aiSignLabelName;
+	public SharedString aiSignLabelName;
 
 	public SharedTransform lookAtTarget;
 
@@ -24,7 +24,7 @@ public class SearchAISign : Conditional {
 	}
 
 	public override TaskStatus OnUpdate() {
-		AISign aiSign = aiSignsHolder.getRandomAISign (aiSignLabelName);
+		AISign aiSign = aiSignsHolder.getRandomAISign (aiSignLabelName.Value);
 		if (aiSign != null) {
 			lookAtTarget.SetValue (aiSign.transform);
 			return TaskStatus.Success;
