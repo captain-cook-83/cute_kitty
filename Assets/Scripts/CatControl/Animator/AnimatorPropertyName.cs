@@ -17,9 +17,12 @@ public class AnimatorPropertyName {
 
 	private int movement2StopTrigger;
 
+	private int interactiveMode;
+
 	private AnimatorPropertyName() {
 		bodyLevel = Animator.StringToHash ("BodyLevel");
 		movement2StopTrigger = Animator.StringToHash ("Movement->Stop");
+		interactiveMode = Animator.StringToHash ("Mode->Interactive");
 	}
 
 	public int BodyLevel {
@@ -28,5 +31,9 @@ public class AnimatorPropertyName {
 
 	public int Movement2StopTrigger {
 		get { return movement2StopTrigger; }
+	}
+
+	public int InteractiveMode {
+		get { return interactiveMode; }
 	}
 }

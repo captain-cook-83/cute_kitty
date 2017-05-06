@@ -48,6 +48,15 @@ public class CharacterMovementController : MonoBehaviour {
 		get { return isMoving; }
 	}
 
+	public void StopMoving() {
+		if (isMoving) {
+			animator.SetTrigger (AnimatorPropertyName.GetInstance().Movement2StopTrigger);
+			animator.SetInteger (AnimatorPropertyName.GetInstance().BodyLevel, AnimatorBodyLevel.Stand);
+			currentPathSegment = null;
+			isMoving = false;
+		}
+	}
+
 	void Start () {
 		animator = GetComponent<Animator> ();
 		seeker = GetComponent<Seeker> ();
@@ -91,10 +100,7 @@ public class CharacterMovementController : MonoBehaviour {
 					transform.LookAt (transform.position + finalDirection);
 				}
 
-				animator.SetTrigger (AnimatorPropertyName.GetInstance().Movement2StopTrigger);
-				animator.SetInteger (AnimatorPropertyName.GetInstance().BodyLevel, AnimatorBodyLevel.Stand);
-				currentPathSegment = null;
-				isMoving = false;
+				StopMoving ();
 			}
 		}
 	}

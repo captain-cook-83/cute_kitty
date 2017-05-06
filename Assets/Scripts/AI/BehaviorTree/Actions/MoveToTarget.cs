@@ -37,4 +37,8 @@ public class MoveToTarget : Action {
 			}
 		}
 	}
+
+	public override void OnEnd() {
+		movementController.StopMoving ();
+	}
 }
