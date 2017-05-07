@@ -39,6 +39,5 @@ public class CharacterInteractionController : MonoBehaviour {
 				}
 			}
 		}
-		Debug.Log (direction.magnitude);
 	}
 }

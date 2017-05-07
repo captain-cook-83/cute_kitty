@@ -6,7 +6,7 @@ public class AStarNavmeshLoader : MonoBehaviour {
 
 	public TextAsset graphData;
 
-	void Start () {
+	void Awake () {
 		AstarPath.active.astarData.DeserializeGraphs (graphData.bytes);
 	}
 }

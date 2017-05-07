@@ -15,18 +15,25 @@ public class AnimatorPropertyName {
 
 	private int bodyLevel;
 
+	private int teaseBTrigger;
+
 	private int movement2StopTrigger;
 
 	private int interactiveMode;
 
 	private AnimatorPropertyName() {
 		bodyLevel = Animator.StringToHash ("BodyLevel");
+		teaseBTrigger = Animator.StringToHash ("BTrigger->Tease");
 		movement2StopTrigger = Animator.StringToHash ("Movement->Stop");
 		interactiveMode = Animator.StringToHash ("Mode->Interactive");
 	}
 
 	public int BodyLevel {
 		get { return bodyLevel; }
+	}
+
+	public int TeaseBTrigger {
+		get { return teaseBTrigger; }
 	}
 
 	public int Movement2StopTrigger {

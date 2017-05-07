@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class AnimatorBodyLevel {
 
+	public const int Sit = -1;
+
 	public const int Stand = 0;
 
 	public const int Walk = 1;

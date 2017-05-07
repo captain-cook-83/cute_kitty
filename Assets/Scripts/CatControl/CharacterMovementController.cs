@@ -18,6 +18,8 @@ public class CharacterMovementController : MonoBehaviour {
 
 	public float minJumpVerticleHeight = 0.05F;
 
+//	public float repathDistance = 0.2F;
+
 	private Animator animator;
 
 	private Seeker seeker;
@@ -25,6 +27,8 @@ public class CharacterMovementController : MonoBehaviour {
 	private JumpStateController jumpStateController;
 
 	private bool isMoving;
+
+	private Vector3 targetPosition = Vector3.zero;
 
 	private Vector3 finalDirection = Vector3.zero;
 
@@ -36,6 +40,7 @@ public class CharacterMovementController : MonoBehaviour {
 
 	public void MoveToTarget(Vector3 targetPosition, Vector3 finalDirection) {
 		this.isMoving = true;
+		this.targetPosition = targetPosition;
 		this.finalDirection = finalDirection;
 		seeker.StartPath (transform.position, targetPosition, OnPathComplete);
 	}
@@ -68,7 +73,6 @@ public class CharacterMovementController : MonoBehaviour {
 	void Update() {
 		if (isInteracived) {
 			RaycastHit hit;
-
 			if (Input.GetMouseButtonDown (0)) {
 				Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
@@ -85,6 +89,14 @@ public class CharacterMovementController : MonoBehaviour {
 				}
 			}
 		}
+
+//		RaycastHit testHit;
+//		Ray testRay = new Ray(transform.position + transform.forward * repathDistance, transform.forward);
+//		if (Physics.Raycast (testRay, out testHit, repathDistance)) {
+//			if (testHit.collider.CompareTag("Player")) {
+//				StopMoving ();
+//			}
+//		}
 	}
 
 	void LateUpdate () {
@@ -99,10 +111,38 @@ public class CharacterMovementController : MonoBehaviour {
 				if (Vector3.zero != finalDirection) {
 					transform.LookAt (transform.position + finalDirection);
 				}
-
 				StopMoving ();
 			}
 		}
+	}
+
+	private float collisionTime;
+	private float collisionTimeInterval = 1F;
+	void OnCollisionEnter(Collision collision) {
+		if (IsMoving && collisionTime + collisionTimeInterval < Time.realtimeSinceStartup && collision.collider.CompareTag("Player")) {
+			collisionTime = Time.realtimeSinceStartup;
+
+			currentPathSegment = null;
+			animator.SetTrigger (AnimatorPropertyName.GetInstance ().Movement2StopTrigger);
+			CharacterMovementController collisionMovementController = collision.transform.GetComponent<CharacterMovementController> ();
+			if (collisionMovementController.IsMoving) {
+				StartCoroutine (RepathForCurrentTarget(transform.GetInstanceID () > collisionMovementController.GetInstanceID ()));
+			} else {
+				StartCoroutine (RepathForCurrentTarget(true));
+			}
+		}
+	}
+
+	private IEnumerator RepathForCurrentTarget(bool priorMove) {
+		if (priorMove) {
+			yield return new WaitForSeconds(0.1F);
+		} else {
+			animator.SetInteger (AnimatorPropertyName.GetInstance().BodyLevel, AnimatorBodyLevel.Stand);
+			animator.SetBool (AnimatorPropertyName.GetInstance().TeaseBTrigger, true);
+			yield return new WaitForSeconds(3F);
+		}
+
+		MoveToTarget (targetPosition, finalDirection);
 	}
 
 	private void OnPathComplete(Path path) {
