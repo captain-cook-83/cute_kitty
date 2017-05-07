@@ -119,8 +119,8 @@ public class CharacterMovementController : MonoBehaviour {
 	private float collisionTime;
 	private float collisionTimeInterval = 1F;
 	void OnCollisionEnter(Collision collision) {
-		if (IsMoving && collisionTime + collisionTimeInterval < Time.realtimeSinceStartup && collision.collider.CompareTag("Player")) {
-			collisionTime = Time.realtimeSinceStartup;
+		if (IsMoving && collisionTime + collisionTimeInterval < Time.time && collision.collider.CompareTag("Player")) {
+			collisionTime = Time.time;
 
 			currentPathSegment = null;
 			animator.SetTrigger (AnimatorPropertyName.GetInstance ().Movement2StopTrigger);
