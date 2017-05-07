@@ -126,7 +126,7 @@ public class CharacterMovementController : MonoBehaviour {
 			animator.SetTrigger (AnimatorPropertyName.GetInstance ().Movement2StopTrigger);
 			CharacterMovementController collisionMovementController = collision.transform.GetComponent<CharacterMovementController> ();
 			if (collisionMovementController.IsMoving) {
-				StartCoroutine (RepathForCurrentTarget(transform.GetInstanceID () > collisionMovementController.GetInstanceID ()));
+				StartCoroutine (RepathForCurrentTarget(transform.GetInstanceID () > collision.transform.GetInstanceID ()));
 			} else {
 				StartCoroutine (RepathForCurrentTarget(true));
 			}
