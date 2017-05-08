@@ -8,7 +8,7 @@ public class OnMovementState : StateMachineBehaviour {
 
 	override public void OnStateMove(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
 		Transform transform = animator.transform;
-		float speedParameter = animator.GetFloat (rootMotionParameterName);
-		transform.position += transform.forward * speedParameter * Time.deltaTime;
+		float stepDistance = animator.GetFloat (rootMotionParameterName) * animator.speed * Time.deltaTime;
+		transform.position += transform.forward * stepDistance;
 	}
 }

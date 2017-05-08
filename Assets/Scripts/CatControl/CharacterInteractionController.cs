@@ -18,11 +18,14 @@ public class CharacterInteractionController : MonoBehaviour {
 
 	private Animator animator;
 
+	private AudioSource audioSource;
+
 	private float clickTime;
 
 	void Awake() {
 		behaviorTree = GetComponent<BehaviorTree> ();
 		animator = GetComponent<Animator> ();
+		audioSource = GetComponent<AudioSource> ();
 	}
 
 	void OnMouseDown() {
@@ -39,5 +42,15 @@ public class CharacterInteractionController : MonoBehaviour {
 				}
 			}
 		}
+	}
+
+	void OnBecameVisible() {
+		Debug.Log (transform.name + " OnBecameVisible");
+		audioSource.mute = false;
+	}
+
+	void OnBecameInvisible() {
+		Debug.Log (transform.name + " OnBecameInvisible");
+		audioSource.mute = true;
 	}
 }

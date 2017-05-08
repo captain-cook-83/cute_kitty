@@ -6,11 +6,13 @@ using BehaviorDesigner.Runtime.Tasks;
 [TaskDescription("判断镜头是否在视野中")]
 public class CameraInSight : Conditional {
 
-	public float maxHorizontalFieldOfView = 15F;
+	public float maxDetectDistance = 3;
+
+	public float maxHorizontalFieldOfView = 15;
 
 	public float minUpwardFieldOfUpView = 30;
 
-	public float checkInterval = 1F;
+	public float checkInterval = 0.15F;
 
 	public SharedBool enableLookAt;
 
@@ -30,25 +32,25 @@ public class CameraInSight : Conditional {
 		if (tickTime > checkInterval) {
 			tickTime = 0;
 
+			bool canSeeCamera = false;
 			Vector3 cameraDirection = cameraTransform.position - transform.position;
-			Vector3 selfDirection = transform.forward;
+			if (cameraDirection.magnitude < maxDetectDistance) {
+				Vector3 selfDirection = transform.forward;
+				__cameraDirection.x = cameraDirection.x;
+				__cameraDirection.y = cameraDirection.z;
+				__selfDirection.x = selfDirection.x;
+				__selfDirection.y = selfDirection.z;
 
-			__cameraDirection.x = cameraDirection.x;
-			__cameraDirection.y = cameraDirection.z;
-			__selfDirection.x = selfDirection.x;
-			__selfDirection.y = selfDirection.z;
-
-			if (Vector2.Angle (__cameraDirection, __selfDirection) < maxHorizontalFieldOfView) {
-				__cameraDirection.x = cameraDirection.z;
-				__cameraDirection.y = cameraDirection.y;
-				__selfDirection.x = selfDirection.z;
-				__selfDirection.y = selfDirection.y;
-				enableLookAt.Value = Vector2.Angle (__cameraDirection, __selfDirection) > minUpwardFieldOfUpView;
-			} else {
-				enableLookAt.Value = false;
+				if (Vector2.Angle (__cameraDirection, __selfDirection) < maxHorizontalFieldOfView) {
+					__cameraDirection.x = cameraDirection.z;
+					__cameraDirection.y = cameraDirection.y;
+					__selfDirection.x = selfDirection.z;
+					__selfDirection.y = selfDirection.y;
+					canSeeCamera = Vector2.Angle (__cameraDirection, __selfDirection) > minUpwardFieldOfUpView;
+				}
 			}
 
-			Debug.Log (transform.name + " -> I " + (enableLookAt.Value ? "can" : " can not") + " see you.");
+			enableLookAt.Value = canSeeCamera;
 			return TaskStatus.Success;
 		} else {
 			tickTime += Time.deltaTime;

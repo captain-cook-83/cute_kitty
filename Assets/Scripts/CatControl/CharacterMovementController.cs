@@ -117,7 +117,7 @@ public class CharacterMovementController : MonoBehaviour {
 	}
 
 	private float collisionTime;
-	private float collisionTimeInterval = 1F;
+	private float collisionTimeInterval = 1;
 	void OnCollisionEnter(Collision collision) {
 		if (IsMoving && collisionTime + collisionTimeInterval < Time.time && collision.collider.CompareTag("Player")) {
 			collisionTime = Time.time;
@@ -139,7 +139,7 @@ public class CharacterMovementController : MonoBehaviour {
 		} else {
 			animator.SetInteger (AnimatorPropertyName.GetInstance().BodyLevel, AnimatorBodyLevel.Stand);
 			animator.SetBool (AnimatorPropertyName.GetInstance().TeaseBTrigger, true);
-			yield return new WaitForSeconds(3F);
+			yield return new WaitForSeconds(3);
 		}
 
 		MoveToTarget (targetPosition, finalDirection);
