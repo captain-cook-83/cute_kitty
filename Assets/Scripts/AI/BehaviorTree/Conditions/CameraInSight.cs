@@ -12,7 +12,7 @@ public class CameraInSight : Conditional {
 
 	public float minUpwardFieldOfUpView = 30;
 
-	public float checkInterval = 0.15F;
+	public float checkInterval = 0.25F;
 
 	public SharedBool enableLookAt;
 
@@ -35,18 +35,13 @@ public class CameraInSight : Conditional {
 			bool canSeeCamera = false;
 			Vector3 cameraDirection = cameraTransform.position - transform.position;
 			if (cameraDirection.magnitude < maxDetectDistance) {
-				Vector3 selfDirection = transform.forward;
 				__cameraDirection.x = cameraDirection.x;
 				__cameraDirection.y = cameraDirection.z;
-				__selfDirection.x = selfDirection.x;
-				__selfDirection.y = selfDirection.z;
+				__selfDirection.x = transform.forward.x;
+				__selfDirection.y = transform.forward.z;
 
 				if (Vector2.Angle (__cameraDirection, __selfDirection) < maxHorizontalFieldOfView) {
-					__cameraDirection.x = cameraDirection.z;
-					__cameraDirection.y = cameraDirection.y;
-					__selfDirection.x = selfDirection.z;
-					__selfDirection.y = selfDirection.y;
-					canSeeCamera = Vector2.Angle (__cameraDirection, __selfDirection) > minUpwardFieldOfUpView;
+					canSeeCamera = Vector3.Angle (cameraDirection, transform.up) < 90 - minUpwardFieldOfUpView;
 				}
 			}
 
