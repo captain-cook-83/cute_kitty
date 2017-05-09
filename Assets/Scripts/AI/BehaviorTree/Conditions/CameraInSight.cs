@@ -6,11 +6,11 @@ using BehaviorDesigner.Runtime.Tasks;
 [TaskDescription("判断镜头是否在视野中")]
 public class CameraInSight : Conditional {
 
+	public SharedInt bodyLevel;
+
 	public float maxDetectDistance = 3;
 
 	public float maxHorizontalFieldOfView = 15;
-
-	public float minUpwardFieldOfUpView = 30;
 
 	public float checkInterval = 0.25F;
 
@@ -24,8 +24,24 @@ public class CameraInSight : Conditional {
 
 	private float tickTime;
 
+	private float minUpwardFieldOfUpView;
+
 	public override void OnStart() {
 		cameraTransform = Camera.main.transform;
+		switch (bodyLevel.Value) {
+		case AnimatorBodyLevel.Lie:
+			minUpwardFieldOfUpView = 30;
+			break;
+		case AnimatorBodyLevel.Stand:
+			minUpwardFieldOfUpView = 45;
+			break;
+		case AnimatorBodyLevel.Sit:
+			minUpwardFieldOfUpView = 50;
+			break;
+		default:
+			minUpwardFieldOfUpView = 90;
+			break;
+		}
 	}
 
 	public override TaskStatus OnUpdate() {
